@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,9 +11,12 @@ namespace XYZCorp.Core
     {
         
         Task<List<TEntity>> GetAllAsync();
-        List<TEntity> GetAll();
         Task<TEntity> GetByIdAsync(int id);
-        TEntity GetById(int id);
+        Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
+        void Add(TEntity entity);
+        void AddRange(IEnumerable<TEntity> entities);
+        void Remove(TEntity entity);
+        void RemoveRange(IEnumerable<TEntity> entities);
         Task SaveAsync();
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using XYZCorp.Core;
@@ -17,16 +18,24 @@ namespace XYZCorp.Repository
             _xYZDbContext = XYZDbContext.XYZDbCtx();
         }
 
-        public async Task<List<TEntity>> GetAllAsync()
+        public void Add(TEntity entity)
         {
-            var result = await _xYZDbContext.Set<TEntity>().ToListAsync();
-            return result;
+            _xYZDbContext.Set<TEntity>().Add(entity);
         }
 
-        public List<TEntity> GetAll()
+        public void AddRange(IEnumerable<TEntity> entities)
         {
-            var result = _xYZDbContext.Set<TEntity>().ToList();
-            return result;
+            _xYZDbContext.Set<TEntity>().AddRange(entities);
+        }
+
+        public async Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _xYZDbContext.Set<TEntity>().Where(predicate).ToListAsync();
+        }
+
+        public async Task<List<TEntity>> GetAllAsync()
+        {
+            return await _xYZDbContext.Set<TEntity>().ToListAsync();
         }
 
         public async Task<TEntity> GetByIdAsync(int id)
@@ -34,17 +43,19 @@ namespace XYZCorp.Repository
             return await _xYZDbContext.Set<TEntity>().FindAsync(id);
         }
 
-        public TEntity GetById(int id)
+        public void Remove(TEntity entity)
         {
-            return _xYZDbContext.Set<TEntity>().Find(id);
+            _xYZDbContext.Set<TEntity>().Remove(entity);
+        }
+
+        public void RemoveRange(IEnumerable<TEntity> entities)
+        {
+            _xYZDbContext.Set<TEntity>().RemoveRange(entities);
         }
 
         public async Task SaveAsync()
         {
-            using (var dbContext = _xYZDbContext)
-            {
-                await dbContext.SaveChangesAsync();
-            }
+            await _xYZDbContext.SaveChangesAsync();
         }
     }
 }

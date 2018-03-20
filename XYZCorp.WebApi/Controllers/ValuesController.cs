@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Routing;
+using XYZCorp.Core.Domain;
 using XYZCorp.Core.Repositories;
 using XYZCorp.Repository.Repositories;
-using XYZCorp.WebApi.Models;
 
 /// <summary>
 /// Developer: Peter Gil O. Villar
@@ -19,13 +19,6 @@ namespace XYZCorp.WebApi.Controllers
     //i can simply rename this class to "UsersController" for automatic routing. and no need to explicitly decorate from some actions
     public class ValuesController : ApiController
     {
-
-        static List<User> _users = new List<User>
-                    {
-                        new User { Id=1, Name="Peter", Points=0 },
-                        new User { Id=2, Name="Jonh", Points=1 }
-                    };
-
 
         private readonly IUserRepository _userRepository;
 
@@ -60,13 +53,14 @@ namespace XYZCorp.WebApi.Controllers
         // POST api/users
         [HttpPost]
         [Route("api/users")]
-        public IHttpActionResult Post(User user)
+        public async Task<IHttpActionResult> Post(User user)
         {
             if (user == null || !ModelState.IsValid)
                 return BadRequest(ModelState);
 
             //save here
-            _users.Add(user);
+            _userRepository.Add(user);
+            await _userRepository.SaveAsync();
 
             return Ok(user.Id);
         }
@@ -74,18 +68,19 @@ namespace XYZCorp.WebApi.Controllers
         // PUT api/setPoints
         [HttpPut]
         [Route("api/setPoints")]
-        public IHttpActionResult Put(User user)
+        public async Task<IHttpActionResult> Put(User user)
         {
             if (user == null || !ModelState.IsValid)
                 return BadRequest(ModelState);
 
             //update here
-            var userFound = _users.Find(x => x.Id == user.Id);
+            var userFound = await _userRepository.GetByIdAsync(user.Id);
 
             if (userFound == null)
                 return NotFound();
 
             userFound.Points = user.Points;
+            await _userRepository.SaveAsync();
 
             return Ok("Success");
         }
