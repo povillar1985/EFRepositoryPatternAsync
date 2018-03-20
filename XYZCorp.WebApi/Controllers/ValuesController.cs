@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Autofac;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Routing;
@@ -17,14 +18,13 @@ namespace XYZCorp.WebApi.Controllers
     /// </summary>
 
     //i can simply rename this class to "UsersController" for automatic routing. and no need to explicitly decorate from some actions
-    public class ValuesController : ApiController
+    public class ValuesController : ApiController, IValuesController
     {
-
         private readonly IUserRepository _userRepository;
 
-        public ValuesController()
+        public ValuesController(IUserRepository userRepository)
         {
-            _userRepository = new UserRepository();
+            _userRepository = userRepository;
         }
 
         // GET api/users
@@ -33,6 +33,16 @@ namespace XYZCorp.WebApi.Controllers
         public async Task<IHttpActionResult> Get()
         {
             var users = await _userRepository.GetAllAsync();
+
+            return Ok(users);
+        }
+
+        // GET api/useradmins
+        [HttpGet]
+        [Route("api/useradmins/{isAdmin}")]
+        public async Task<IHttpActionResult> Get(bool isAdmin)
+        {
+            var users = await _userRepository.GetUserAdminsAsync();
 
             return Ok(users);
         }

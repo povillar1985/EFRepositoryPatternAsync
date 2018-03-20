@@ -11,12 +11,13 @@ namespace XYZCorp.Repository.Repositories
 {
     public class UserRepository : Repository<User>, IUserRepository
     {
+        public UserRepository(Func<XYZDbContext> xYZDbContext) : base(xYZDbContext)
+        {
+        }
+
         public async Task<List<User>> GetUserAdminsAsync()
         {
-            using (var dbContext = _xYZDbContext)
-            {
-                return await _xYZDbContext.Users.Take(2).ToListAsync();
-            }
+            return await _xYZDbContext.Users.Take(2).ToListAsync();
         }
     }
 }

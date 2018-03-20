@@ -11,11 +11,11 @@ namespace XYZCorp.Repository
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
     {
-        protected XYZDbContext _xYZDbContext;// = new XYZDbContext();
+        protected readonly XYZDbContext _xYZDbContext;
 
-        public Repository()
+        public Repository(Func<XYZDbContext> xYZDbContext)
         {
-            _xYZDbContext = XYZDbContext.XYZDbCtx();
+            _xYZDbContext = xYZDbContext();
         }
 
         public void Add(TEntity entity)

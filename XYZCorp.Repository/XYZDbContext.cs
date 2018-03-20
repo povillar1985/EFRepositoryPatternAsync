@@ -10,15 +10,15 @@ namespace XYZCorp.Repository
         {
         }
 
-        private static XYZDbContext _context;
-        public static XYZDbContext XYZDbCtx()
-        {
-            if (_context == null)
-            {
-                _context = new XYZDbContext();
-            }
-            return _context;
-        }
+        //////private static XYZDbContext _context;
+        //////public static XYZDbContext XYZDbCtx()
+        //////{
+        //////    if (_context == null)
+        //////    {
+        //////        _context = new XYZDbContext();
+        //////    }
+        //////    return _context;
+        //////}
 
         public virtual DbSet<User> Users { get; set; }
 
