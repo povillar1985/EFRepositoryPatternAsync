@@ -10,3 +10,4 @@ This sample project are using the ff:
 * NUnit
 * Autofac.Moq
 * Moq
+* Swagger - to test the web api
