@@ -1,10 +1,12 @@
 ﻿using Autofac.Extras.Moq;
+using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Results;
 using XYZCorp.Core.Domain;
+using XYZCorp.Core.Repositories;
 using XYZCorp.WebApi.Controllers;
 
 /// <summary>
@@ -16,62 +18,126 @@ namespace XYZCorp.WebApi.Tests.Controllers
     public class ValuesControllerTest
     {
 
-        //[Test]
-        //public async Task Get_ReturnType_ListOfUser()
-        //{
-        //    //////// Arrange
-        //    //////var mockUserRepository = new Mock<IUserRepository>();
-        //    //////mockUserRepository.Setup(m => m.GetAllAsync());
-        //    //////var controller = new ValuesController(mockUserRepository.Object);
-        //    //////// Act
-        //    //////IHttpActionResult result = await controller.Get();
-        //    //////var contentResult = result as OkNegotiatedContentResult<List<User>>;
+        private Mock<IUserRepository> _mockUserRepository = new Mock<IUserRepository>();
+        private ValuesController _controllerInstance;
 
-        //    //////// Assert
-        //    //////Assert.IsInstanceOf<List<User>>(contentResult.Content);
+        private List<User> _mockData = new List<User>();
 
-        //     using (var mock = AutoMock.GetLoose())
-        //    {
-        //        mock.Mock<ValuesController>().Setup(m => m.Get(1).Result).Returns(OkNegotiatedContentResult<User>);
-        //        var controller = mock.Create<ValuesController>();
+        public ValuesControllerTest()
+        {
+            _mockUserRepository.Setup(m => m.GetAllAsync());
+            _controllerInstance = new ValuesController(_mockUserRepository.Object);
 
-        //        //Act
-        //        IHttpActionResult result = await controller.Get();
-        //        var contentResult = result as OkNegotiatedContentResult<List<User>>;
+            _mockData.AddRange(new User[] {
+                    new User { Id = 1, Name="Peter", Points = 1 },
+                    new User { Id = 1, Name="Jonh", Points = 2 }
+                });
+        }
 
-        //        //Assert
-        //        Assert.IsInstanceOf<List<User>>(contentResult.Content);
-        //    }
-        //}
+        [Test]
+        public async Task Get_ReturnType_ListOfUser()
+        {
+            //// Arrange
+            //var mockUserRepository = new Mock<IUserRepository>();
+            //mockUserRepository.Setup(m => m.GetAllAsync());
+            //var controller = new ValuesController(mockUserRepository.Object);
+            //// Act
+            //IHttpActionResult result = await controller.Get();
+            //var contentResult = result as OkNegotiatedContentResult<List<User>>;
 
-        //////[Test]
-        //////public async Task Get_ReturnCount_Two()
-        //////{
-        //////    // Arrange
-        //////    //ValuesController controller = new ValuesController();
+            //// Assert
+            //Assert.IsInstanceOf<List<User>>(contentResult.Content);
 
-        //////    // Act
-        //////    IHttpActionResult result = await _controller.Get();
-        //////    var contentResult = result as OkNegotiatedContentResult<List<User>>;
+            using (var mock = AutoMock.GetLoose())
+            {
+                //Arrange
+                var users = _mockData;                
 
-        //////    // Assert
-        //////    Assert.IsNotNull(contentResult);
-        //////    Assert.AreEqual(2, contentResult.Content.Count());
-        //////}
+                mock.Mock<IValuesController>().Setup((m) => m.Get())
+                    .ReturnsAsync(new OkNegotiatedContentResult<List<User>>(
+                        users, _controllerInstance)
+                    );
 
-        //////[Test]
-        //////public async Task Get_ById_NotFoundType()
-        //////{
-        //////    // Arrange
-        //////    //ValuesController controller = new ValuesController();
+                var controller = mock.Create<IValuesController>();
 
-        //////    // Act
-        //////    IHttpActionResult result = await _controller.Get(-1);
-        //////    var contentResult = result as NotFoundResult;
+                //Act
+                IHttpActionResult result = await controller.Get();
+                var contentResult = result as OkNegotiatedContentResult<List<User>>;
 
-        //////    // Assert
-        //////    Assert.IsInstanceOf(typeof(NotFoundResult), contentResult);
-        //////}
+                //Assert
+                Assert.IsInstanceOf<List<User>>(contentResult.Content);
+            }
+        }
+
+        [Test]
+        public async Task Get_ReturnCount_Two()
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                //Arrange
+                var users = _mockData;
+
+                mock.Mock<IValuesController>().Setup((m) => m.Get())
+                    .ReturnsAsync(new OkNegotiatedContentResult<List<User>>(
+                        users, _controllerInstance)
+                    );
+
+                var controller = mock.Create<IValuesController>();
+
+                //Act
+                IHttpActionResult result = await controller.Get();
+                var contentResult = result as OkNegotiatedContentResult<List<User>>;
+
+                //Assert
+                Assert.IsNotNull(contentResult.Content);
+                Assert.AreEqual(2, contentResult.Content.Count);
+            }
+        }
+
+        [Test]
+        public async Task Get_ById_NotFoundType()
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                //Arrange
+                mock.Mock<IValuesController>().Setup((m) => m.Get(-1))
+                    .ReturnsAsync(new NotFoundResult(
+                        _controllerInstance)
+                    );
+
+                var controller = mock.Create<IValuesController>();
+
+                //Act
+                IHttpActionResult result = await controller.Get(-1);
+                var contentResult = result as NotFoundResult;
+
+                // Assert
+                Assert.IsInstanceOf(typeof(NotFoundResult), contentResult);
+            }
+        }
+
+        [Test]
+        public async Task Get_ById_FoundTypeOfUser()
+        {
+            using (var mock = AutoMock.GetLoose())
+            {
+                //Arrange
+                var user = _mockData.Find(x => x.Id == 2);
+                mock.Mock<IValuesController>().Setup((m) => m.Get(2))
+                    .ReturnsAsync(new OkNegotiatedContentResult<User>(
+                        user, _controllerInstance)
+                    );
+
+                var controller = mock.Create<IValuesController>();
+
+                //Act
+                IHttpActionResult result = await controller.Get(2);
+                var contentResult = result as OkNegotiatedContentResult<User>;
+
+                // Assert
+                Assert.IsInstanceOf(typeof(User), contentResult.Content);
+            }
+        }
 
         //////[Test]
         //////public async Task Get_ById_FoundTypeOfUser()
@@ -92,7 +158,7 @@ namespace XYZCorp.WebApi.Tests.Controllers
         //////{
         //////    // Arrange
         //////    //ValuesController controller = new ValuesController();
-            
+
         //////    // Act
         //////    IHttpActionResult result = await _controller.Get(2);
         //////    var contentResult = result as OkNegotiatedContentResult<User>;

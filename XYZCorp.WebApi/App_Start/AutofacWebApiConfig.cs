@@ -23,10 +23,11 @@ namespace XYZCorp.WebApi.App_Start
         private static IContainer RegisterServices(ContainerBuilder builder) {
             builder.RegisterApiControllers(Assembly.GetExecutingAssembly());
 
-            builder.RegisterType<UserRepository>().As<IUserRepository>();
-            builder.RegisterType<XYZDbContext>().AsSelf().SingleInstance();
 
-            builder.RegisterType<ValuesController>().As<IValuesController>();
+            builder.RegisterType<ValuesController>().As<IValuesController>().InstancePerDependency();
+
+            builder.RegisterType<UserRepository>().As<IUserRepository>().InstancePerDependency();
+            builder.RegisterType<XYZDbContext>().AsSelf().InstancePerDependency();
 
             Container = builder.Build();
 
