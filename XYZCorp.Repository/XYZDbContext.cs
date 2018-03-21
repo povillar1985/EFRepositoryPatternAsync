@@ -27,6 +27,7 @@ namespace XYZCorp.Repository
             base.OnModelCreating(modelBuilder);
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
 
+            //alternatively, I can use data anotations from my domain object(s) for this
             modelBuilder.Entity<User>()
                 .Property(x => x.Name)
                 .IsRequired()
