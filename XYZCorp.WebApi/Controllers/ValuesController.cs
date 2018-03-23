@@ -1,11 +1,8 @@
-﻿using Autofac;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Routing;
 using XYZCorp.Core.Domain;
 using XYZCorp.Core.Repositories;
-using XYZCorp.Repository.Repositories;
 
 /// <summary>
 /// Developer: Peter Gil O. Villar
@@ -43,6 +40,16 @@ namespace XYZCorp.WebApi.Controllers
         public async Task<IHttpActionResult> Get(bool isAdmin)
         {
             var users = await _userRepository.GetUserAdminsAsync();
+
+            return Ok(users);
+        }
+
+        // GET api/useradmins
+        [HttpGet]
+        [Route("api/usersbypoints/{points}")]
+        public IHttpActionResult Get(int? points)
+        {
+            var users = _userRepository.GetUsersByPoints(points??0);
 
             return Ok(users);
         }

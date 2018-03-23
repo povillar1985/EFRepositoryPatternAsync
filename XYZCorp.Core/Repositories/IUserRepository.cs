@@ -10,5 +10,6 @@ namespace XYZCorp.Core.Repositories
     public interface IUserRepository: IRepository<User>
     {
         Task<List<User>> GetUserAdminsAsync();
+        IEnumerable<User> GetUsersByPoints(int points);
     }
 }
